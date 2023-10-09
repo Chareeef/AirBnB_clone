@@ -1,10 +1,10 @@
-# AirBnB Clone Command Interpreter (console.py)
+# AirBnB Clone Project - The Console
 
 ![AirBnB Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Airbnb_Logo_B%C3%A9lo.svg/1280px-Airbnb_Logo_B%C3%A9lo.svg.png)
 
 ## Description of the Project
 
-The AirBnB Clone project is the first step in building a full web application that emulates the core functionalities of the popular platform Airbnb. This initial step focuses on creating a command-line interpreter (CLI) to manage AirBnB objects. The project sets the foundation for subsequent development tasks, including HTML/CSS templating, database storage, API integration, and front-end development.
+This project is the first step in building a full web application that emulates the core functionalities of the popular platform Airbnb. This initial step focuses on creating a command-line interpreter (CLI) to manage AirBnB objects. The project sets the foundation for subsequent development tasks, including HTML/CSS templating, database storage, API integration, and front-end development.
 
 ## Description of the Command Interpreter
 
