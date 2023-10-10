@@ -1,8 +1,56 @@
 #!/usr/bin/python3
 
+"""Unittests for models/base_model.py
+
+Test Classes:
+    TestCreateFromDict
+    TestModel_instantiation
+"""
+
 from models.base_model import BaseModel
 import datetime
 import unittest
+
+
+class TestModel_instantiation(unittest.TestCase):
+    """
+    This Class tests instantiation of the base model class
+    """
+
+    def test_no_args(self):
+        self.assertEqual(BaseModel, type(BaseModel()))
+
+    def test_id_type(self):
+        self.assertEqual(str, type(BaseModel().id))
+
+    def test_updated_at_type(self):
+        self.assertEqual(datetime.datetime, type(BaseModel().updated_at))
+
+    def test_created_at_type(self):
+        self.assertEqual(datetime.datetime, type(BaseModel().created_at))
+
+    def test_unique_ids(self):
+        base_model1 = BaseModel()
+        base_model2 = BaseModel()
+        self.assertNotEqual(base_model1.id, base_model2.id)
+
+    def test_str_representation(self):
+        today = datetime.datetime.today()
+        today_representation = repr(today)
+        base_model1 = BaseModel()
+        base_model1.id = "5"
+        base_model1.created_at = today
+        base_model1.updated_at = today
+
+        model_str = base_model1.__str__()
+        self.assertIn("[BaseModel] (5)", model_str)
+        self.assertIn("'id': '5'", model_str)
+        self.assertIn("'created_at': " + today_representation, model_str)
+        self.assertIn("'updated_at': " + today_representation, model_str)
+
+    def test_none_args(self):
+        base_model = BaseModel(None)
+        self.assertNotIn(None, base_model.__dict__.values())
 
 
 class TestCreateFromDict(unittest.TestCase):
