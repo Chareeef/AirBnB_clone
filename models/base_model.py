@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 '''This module implements the BaseModel class'''
+import models
 import datetime
 import uuid
 
@@ -25,9 +26,6 @@ class BaseModel():
             *args (any): won't be used.
             **kwargs (dict): non-empty Key/value pairs of attributes.
         """
-        self.id = str(uuid.uuid4())
-        self.created_at = datetime.datetime.now()
-        self.updated_at = datetime.datetime.now()
 
         if len(kwargs) != 0:
             frmt = "%Y-%m-%dT%H:%M:%S.%f"
@@ -36,11 +34,17 @@ class BaseModel():
                     self.__dict__[key] = datetime.datetime.strptime(val, frmt)
                 elif key != '__class__':
                     self.__dict__[key] = val
+        else:
+            self.id = str(uuid.uuid4())
+            self.created_at = datetime.datetime.now()
+            self.updated_at = datetime.datetime.now()
+            models.storage.new(self)
 
     def save(self):
         '''Updates `updated_at` with the current datetime'''
 
         self.updated_at = datetime.datetime.now()
+        models.storage.save()
 
     def to_dict(self):
         '''
