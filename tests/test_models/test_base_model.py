@@ -52,8 +52,8 @@ class TestModel_instantiation(unittest.TestCase):
         self.assertIn("'updated_at': " + today_representation, model_str)
 
     def test__args(self):
-        with self.assertRaises(TypeError):
-            base_model = BaseModel(None)
+        base_model = BaseModel(None)
+        self.assertNotIn(None, base_model.__dict__.values())
 
 
 class TestSave(unittest.TestCase):
@@ -104,7 +104,7 @@ class TestToDict(unittest.TestCase):
         self.assertEqual(str, type(base_dict["updated_at"]))
 
     def test_dict_format(self):
-        dt = datetime.now()
+        dt = datetime.datetime.now()
         base_model = BaseModel()
         base_model.id = "1"
         base_model.created_at = base_model.updated_at = dt

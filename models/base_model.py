@@ -29,12 +29,12 @@ class BaseModel():
         self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()
 
-        if len(kwargs != 0):
+        if len(kwargs) != 0:
             frmt = "%Y-%m-%dT%H:%M:%S.%f"
             for key, val in kwargs.items():
                 if key in ["created_at", "updated_at"]:
                     self.__dict__[key] = datetime.datetime.strptime(val, frmt)
-                else:
+                elif key != '__class__':
                     self.__dict__[key] = val
 
     def save(self):
