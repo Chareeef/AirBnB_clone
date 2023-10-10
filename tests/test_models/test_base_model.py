@@ -37,6 +37,18 @@ class TestModel_instantiation(unittest.TestCase):
         base_model2 = BaseModel()
         self.assertNotEqual(base_model1.id, base_model2.id)
 
+    def test_different_created_dates(self):
+        base_model1 = BaseModel()
+        time.sleep(0.1)
+        base_model2 = BaseModel()
+        self.assertLess(base_model1.created_at, base_model2.created_at)
+
+    def test_different_updated_dates(self):
+        base_model1 = BaseModel()
+        time.sleep(0.1)
+        base_model2 = BaseModel()
+        self.assertLess(base_model1.updated_at, base_model2.updated_at)
+
     def test_str_representation(self):
         today = datetime.datetime.today()
         today_representation = repr(today)
@@ -52,8 +64,28 @@ class TestModel_instantiation(unittest.TestCase):
         self.assertIn("'updated_at': " + today_representation, model_str)
 
     def test__args(self):
+        base_model = BaseModel(None)
+        self.assertNotIn(None, base_model.__dict__.values())
+
+    def test_kwargs(self):
+        date = datetime.datetime.now()
+        isodate = date.isoformat()
+        base_model = BaseModel(id="1", created_at=isodate, updated_at=isodate)
+        self.assertEqual(base_model.id, "1")
+        self.assertEqual(base_model.created_at, date)
+        self.assertEqual(base_model.updated_at, date)
+
+    def test_empty_kwargs(self):
         with self.assertRaises(TypeError):
-            base_model = BaseModel(None)
+            BaseModel(id=None, created_at=None, updated_at=None)
+
+    def test_instantiation_with_args_and_kwargs(self):
+        date = datetime.datetime.now()
+        dt_iso = date.isoformat()
+        base_model = BaseModel("5", id="1", created_at=dt_iso, updated_at=dt_iso)
+        self.assertEqual(base_model.id, "1")
+        self.assertEqual(base_model.created_at, date)
+        self.assertEqual(base_model.updated_at, date)
 
 
 class TestSave(unittest.TestCase):
@@ -104,7 +136,7 @@ class TestToDict(unittest.TestCase):
         self.assertEqual(str, type(base_dict["updated_at"]))
 
     def test_dict_format(self):
-        dt = datetime.now()
+        dt = datetime.datetime.now()
         base_model = BaseModel()
         base_model.id = "1"
         base_model.created_at = base_model.updated_at = dt
