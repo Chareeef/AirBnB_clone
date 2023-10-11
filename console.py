@@ -36,7 +36,7 @@ class HBNBCommand(cmd.Cmd):
 
         args = str_arg.split()
 
-        if len(args) < 1:
+        if len(args) == 0:
             print('** class name missing **')
             return
         elif args[0] not in self.classes:
@@ -127,6 +127,24 @@ class HBNBCommand(cmd.Cmd):
 
     def emptyline(self):
         pass
+
+    def do_all(self, str_arg):
+        """
+        Display string representations of all instances of a given class.
+        If no class is specified, displays all instantiated objects.
+        """
+
+        args = str_arg.split()
+        if len(args) > 0 and args[0] not in self.classes:
+            print("** class doesn't exist **")
+        else:
+            objects = []
+            for obj in storage.all().values():
+                if len(args) != 0 and args[0] == obj.__class__.__name__:
+                    objects.append(obj.__str__())
+                elif len(args) == 0:
+                    objects.append(obj.__str__())
+            print(objects)
 
 
 if __name__ == '__main__':
