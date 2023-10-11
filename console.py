@@ -2,6 +2,7 @@
 '''The implementation of the console (CLI) for the AirBnB project'''
 import cmd
 from models.base_model import BaseModel
+from models.user import User
 from models import storage
 import sys
 
@@ -11,22 +12,25 @@ class HBNBCommand(cmd.Cmd):
 
     prompt = '(hbnb) '
     classes = {
-            'BaseModel': BaseModel
+            'BaseModel': BaseModel,
+            'User': User
             }
 
     def do_quit(self, str_arg):
         '''This command exits the program, same as `EOF`'''
-        
+
         return True
 
     def do_EOF(self, str_arg):
         '''This command exits the program, same as `quit`'''
-        
+
         return True
 
     def do_create(self, str_arg):
         '''
-        Creates a new instance of BaseModel, saves it (to the JSON file) and prints the id.
+        Creates a new instance of a class, saves it (to the JSON file)
+        and prints the id.
+
         Ex: (hbnb) create BaseModel
         '''
 
@@ -51,8 +55,10 @@ class HBNBCommand(cmd.Cmd):
 
     def do_show(self, str_arg):
         '''
-        Prints the string representation of an instance based on the class name and id
-        Ex: $ show BaseModel 1234-1234-1234
+        Prints the string representation of an instance
+        based on the class name and id
+
+        Ex: (hbnb) show User 1234-1234-1234
         '''
 
         args = str_arg.split()
@@ -86,7 +92,8 @@ class HBNBCommand(cmd.Cmd):
         '''
         Deletes an instance based on the class name and id,
         and saves the change into the JSON file
-        Ex: $ destroy BaseModel 1234-1234-1234
+
+        Ex: (hbnb) destroy BaseModel 1234-1234-1234
         '''
 
         args = str_arg.split()
@@ -120,6 +127,7 @@ class HBNBCommand(cmd.Cmd):
 
     def emptyline(self):
         pass
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
