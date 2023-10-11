@@ -9,6 +9,8 @@ Test Classes:
     TestToDict
 """
 
+import models
+import os
 from models.base_model import BaseModel
 import datetime
 import unittest
@@ -75,14 +77,17 @@ class TestModel_instantiation(unittest.TestCase):
         self.assertEqual(base_model.created_at, date)
         self.assertEqual(base_model.updated_at, date)
 
+    def test_instance_in_storage(self):
+        self.assertIn(BaseModel(), models.storage.all().values())
+
     def test_empty_kwargs(self):
         with self.assertRaises(TypeError):
             BaseModel(id=None, created_at=None, updated_at=None)
 
     def test_instantiation_with_args_and_kwargs(self):
         date = datetime.datetime.now()
-        dt_iso = date.isoformat()
-        base_model = BaseModel("5", id="1", created_at=dt_iso, updated_at=dt_iso)
+        diso = date.isoformat()
+        base_model = BaseModel("5", id="1", created_at=diso, updated_at=diso)
         self.assertEqual(base_model.id, "1")
         self.assertEqual(base_model.created_at, date)
         self.assertEqual(base_model.updated_at, date)
@@ -93,17 +98,53 @@ class TestSave(unittest.TestCase):
     Testing save method of the BaseModel class.
     """
 
+    @classmethod
+    def setUp(self):
+        try:
+            os.rename("file.json", "tmp")
+        except IOError:
+            pass
+
+    @classmethod
+    def tearDown(self):
+        try:
+            os.remove("file.json")
+        except IOError:
+            pass
+        try:
+            os.rename("tmp", "file.json")
+        except IOError:
+            pass
+
     def test_save(self):
-        bm = BaseModel()
+        base_model = BaseModel()
         time.sleep(0.1)
-        old_updated_at = bm.updated_at
-        bm.save()
-        self.assertLess(old_updated_at, bm.updated_at)
+        old_updated_at = base_model.updated_at
+        base_model.save()
+        self.assertLess(old_updated_at, base_model.updated_at)
+
+    def test_saving_twice(self):
+        base_model = BaseModel()
+        time.sleep(0.1)
+        updated_at1 = base_model.updated_at
+        base_model.save()
+        updated_at2 = base_model.updated_at
+        self.assertLess(updated_at1, updated_at2)
+        time.sleep(0.05)
+        base_model.save()
+        self.assertLess(updated_at2, base_model.updated_at)
 
     def test_args(self):
         base_model = BaseModel()
         with self.assertRaises(TypeError):
             base_model.save(None)
+
+    def test_storage_file(self):
+        base_model = BaseModel()
+        base_model.save()
+        base_model_id = "BaseModel." + base_model.id
+        with open("file.json", "r") as f:
+            self.assertIn(base_model_id, f.read())
 
 
 class TestToDict(unittest.TestCase):
@@ -152,6 +193,10 @@ class TestToDict(unittest.TestCase):
         base_model = BaseModel()
         with self.assertRaises(TypeError):
             base_model.to_dict(None)
+
+    def test_original_dict(self):
+        base_model = BaseModel()
+        self.assertNotEqual(base_model.to_dict(), base_model.__dict__)
 
 
 class TestCreateFromDict(unittest.TestCase):
