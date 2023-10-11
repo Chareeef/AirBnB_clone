@@ -1,10 +1,15 @@
 #!/usr/bin/python3
 '''The implementation of the console (CLI) for the AirBnB project'''
 import cmd
+import sys
+from models import storage
 from models.base_model import BaseModel
 from models.user import User
-from models import storage
-import sys
+from models.state import State
+from models.city import City
+from models.place import Place
+from models.amenity import Amenity
+from models.review import Review
 
 
 class HBNBCommand(cmd.Cmd):
@@ -13,7 +18,12 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
     classes = {
             'BaseModel': BaseModel,
-            'User': User
+            'User': User,
+            'State': State,
+            'City': City,
+            'Place': Place,
+            'Amenity': Amenity,
+            'Review': Review
             }
 
     def do_quit(self, str_arg):
@@ -125,13 +135,12 @@ class HBNBCommand(cmd.Cmd):
 
         return [cls for cls in self.classes if cls.startswith(text)]
 
-    def emptyline(self):
-        pass
-
     def do_all(self, str_arg):
         """
         Display string representations of all instances of a given class.
         If no class is specified, displays all instantiated objects.
+
+        Ex: (hbnb) all Amenity
         """
 
         args = str_arg.split()
@@ -146,10 +155,17 @@ class HBNBCommand(cmd.Cmd):
                     objects.append(obj.__str__())
             print(objects)
 
+    def complete_all(self, text, line, begidx, endix):
+        '''Provides Tab-completion for all command'''
+
+        return [cls for cls in self.classes if cls.startswith(text)]
+
     def do_update(self, str_args):
         """
         Update a class instance of a given id by adding or updating
         a given attribute key/value pair or dictionary.
+
+        Ex: (hbnb) update User 49faff9a-6318-451f-87b6-910505c55907 first_name "Betty"
         """
         args = str_args.split()
         objects = storage.all()
@@ -183,6 +199,15 @@ class HBNBCommand(cmd.Cmd):
             else:
                 obj.__dict__[args[2]] = args[3]
         storage.save()
+
+    def complete_update(self, text, line, begidx, endix):
+        '''Provides Tab-completion for update command'''
+
+        return [cls for cls in self.classes if cls.startswith(text)]
+
+    def emptyline(self):
+        pass
+
 
 
 if __name__ == '__main__':
