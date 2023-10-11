@@ -2,6 +2,7 @@
 '''This module implements the FileStorage class'''
 import json
 
+
 class FileStorage():
     '''
     A FileStorage class that serializes instances to a JSON file
@@ -48,9 +49,17 @@ class FileStorage():
                 dict_objs = json.load(f)
 
             from models.base_model import BaseModel
+            from models.user import User
+
+            classes = {
+                    'BaseModel': BaseModel,
+                    'User': User
+                    }
 
             for key, obj_dict in dict_objs.items():
-                new_obj = BaseModel(**obj_dict)
+                cls_name, inst_id = key.split('.')
+                cls = classes[cls_name]
+                new_obj = cls(**obj_dict)
                 self.new(new_obj)
 
         except FileNotFoundError:
