@@ -1,0 +1,16 @@
+#!/usr/bin/python3
+"""This module implements the BaseModel class"""
+import models
+
+
+class City(models.base_model.BaseModel):
+    """
+    The City class that inherits from BaseModel
+
+        Public class attributes:
+                state_id: string - empty string: it will be the State.id
+                name: string - empty string
+    """
+
+    state_id = ""
+    name = ""
