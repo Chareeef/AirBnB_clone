@@ -218,7 +218,11 @@ class HBNBCommand(cmd.Cmd):
 
         Ex: (hbnb) update User 49faff9a-6318-451f-87b6-9105 first_name "Betty"
         """
-        args = str_args.split()
+        input_string = str_args
+        arguments = re.findall(r'[^"\s]+|"[^"]*"', input_string)
+
+        # Clean up the double quotes
+        args = [arg.strip('"') for arg in arguments]
         objects = storage.all()
 
         if len(args) == 0:
