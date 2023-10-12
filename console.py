@@ -39,16 +39,25 @@ class HBNBCommand(cmd.Cmd):
 
     @staticmethod
     def parse_all(line):
-        '''Parse commands such as: BaseModel.all()'''
+        '''Parse commands such as: <model>.all()'''
 
         cls = line.split('.')[0]
 
         return f'all {cls}'
 
+    @staticmethod
+    def parse_count(line):
+        '''Parse commands such as: <model>.count()'''
+
+        cls = line.split('.')[0]
+
+        return f'count {cls}'
+
     def precmd(self, line):
         '''Preprocess the command line'''
 
-        commands_parsers = {r'^ *\w+.all\(\) *$': self.parse_all}
+        commands_parsers = {r'^ *\w+.all\(\) *$': self.parse_all,
+                            r'^ *\w+.count\(\) *$': self.parse_count}
 
         for pattern in commands_parsers:
             if re.search(pattern, line):
@@ -116,7 +125,7 @@ class HBNBCommand(cmd.Cmd):
     def complete_show(self, text, line, begidx, endix):
         '''Provides Tab-completion for show command'''
 
-        return [cls for cls in self.classes if cls.startswith(text)]
+        return [cls + ' ' for cls in self.classes if cls.startswith(text)]
 
     def do_destroy(self, str_arg):
         '''
@@ -153,7 +162,7 @@ class HBNBCommand(cmd.Cmd):
     def complete_destroy(self, text, line, begidx, endix):
         '''Provides Tab-completion for destroy command'''
 
-        return [cls for cls in self.classes if cls.startswith(text)]
+        return [cls + ' ' for cls in self.classes if cls.startswith(text)]
 
     def do_all(self, str_arg):
         """
@@ -185,7 +194,7 @@ class HBNBCommand(cmd.Cmd):
         Update a class instance of a given id by adding or updating
         a given attribute key/value pair or dictionary.
 
-        Ex: (hbnb) update User 49faff9a-6318-451f-87b6-910505c55907 first_name "Betty"
+        Ex: (hbnb) update User 49faff9a-6318-451f-87b6-9105 first_name "Betty"
         """
         args = str_args.split()
         objects = storage.all()
@@ -223,11 +232,32 @@ class HBNBCommand(cmd.Cmd):
     def complete_update(self, text, line, begidx, endix):
         '''Provides Tab-completion for update command'''
 
-        return [cls for cls in self.classes if cls.startswith(text)]
+        return [cls + ' ' for cls in self.classes if cls.startswith(text)]
+
+    def do_count(self, str_args):
+        """
+        Retrieve the number of instances of a class
+
+        Executed by typing: (hbnb) <class name>.count()
+        """
+        args = str_args.split()
+        objects_dict = storage.all()
+        counting = 0
+
+        if len(args) == 0:
+            print("** class name missing **")
+            return
+
+        cls_name = args[0]
+
+        for key, obj in objects_dict.items():
+            if cls_name == key.split('.')[0]:
+                counting += 1
+
+        print(counting)
 
     def emptyline(self):
         pass
-
 
 
 if __name__ == '__main__':
