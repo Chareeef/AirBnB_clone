@@ -8,6 +8,7 @@ Unittest classes:
 import models
 import unittest
 import os
+import shutil
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
 
@@ -38,18 +39,16 @@ class TestMethods(unittest.TestCase):
     @classmethod
     def setUp(self):
         try:
-            os.rename("file.json", "temp")
+            shutil.copy2("file.json", "temp")
+            FileStorage._FileStorage__file_path = "temp"
         except IOError:
             pass
 
     @classmethod
     def tearDown(self):
         try:
-            os.remove("file.json")
-        except IOError:
-            pass
-        try:
-            os.rename("temp", "file.json")
+            os.remove("temp")
+            FileStorage._FileStorage__file_path = "file.json"
         except IOError:
             pass
         FileStorage._FileStorage__objects = {}
@@ -74,7 +73,8 @@ class TestMethods(unittest.TestCase):
     def test_save_method(self):
         base_m = BaseModel()
         models.storage.new(base_m)
-        with open("file.json", "r") as f:
+        models.storage.save()
+        with open("temp", "r") as f:
             storage_content = f.read()
             self.assertIn("BaseModel." + base_m.id, storage_content)
 
