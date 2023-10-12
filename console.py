@@ -53,15 +53,33 @@ class HBNBCommand(cmd.Cmd):
 
         return f'count {cls}'
 
+    @staticmethod
+    def parse_show_destroy(line):
+        '''Parse commands such as: <model>.show() or <model>.destroy'''
+
+        line = line.strip()
+        line = line[:-1]
+        line = line.replace('.', ' ', 1).replace('(', ' ', 1).replace(',', '')
+        splitted= line.split()
+
+        splitted.extend(['', '', ''])
+        command, cls, inst_id = splitted[1], splitted[0], splitted[2]
+
+        new_line = f'{command} {cls} {inst_id}'
+
+        return new_line
+
     def precmd(self, line):
         '''Preprocess the command line'''
 
-        commands_parsers = {r'^ *\w+.all\(\) *$': self.parse_all,
-                            r'^ *\w+.count\(\) *$': self.parse_count}
+        cmds_formers = {r'^ *\w*.all\(\) *$': self.parse_all,
+                        r'^ *\w*.count\(\) *$': self.parse_count,
+                        r'^ *\w*.show\(.*\) *$': self.parse_show_destroy,
+                        r'^ *\w*.destroy\(.*\) *$': self.parse_show_destroy}
 
-        for pattern in commands_parsers:
+        for pattern in cmds_formers:
             if re.search(pattern, line):
-                return commands_parsers[pattern](line)
+                return cmds_formers[pattern](line)
         else:
             return line
 
