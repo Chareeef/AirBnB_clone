@@ -90,10 +90,12 @@ class TestMethods(unittest.TestCase):
 
     def test_reload_method(self):
         base_m = BaseModel()
+
         models.storage.new(base_m)
         models.storage.save()
         models.storage.reload()
         storage_objs = FileStorage._FileStorage__objects
+
         self.assertIn("BaseModel." + base_m.id, storage_objs)
 
     def test_reload_method_args(self):
@@ -139,10 +141,12 @@ class TestWithUser(unittest.TestCase):
         obj = User()
         key = "User." + obj.id
         obj.name = 'Link'
+
         models.storage.new(obj)
         models.storage.save()
         models.storage.reload()
         storage_objs = FileStorage._FileStorage__objects
+
         self.assertIn(key, storage_objs)
         self.assertEqual(storage_objs[key].id, obj.id)
         self.assertEqual(storage_objs[key].name, 'Link')
@@ -186,10 +190,12 @@ class TestWithState(unittest.TestCase):
         obj = State()
         key = "State." + obj.id
         obj.name = 'California'
+
         models.storage.new(obj)
         models.storage.save()
         models.storage.reload()
         storage_objs = FileStorage._FileStorage__objects
+
         self.assertIn(key, storage_objs)
         self.assertEqual(storage_objs[key].id, obj.id)
         self.assertEqual(storage_objs[key].name, 'California')
@@ -233,10 +239,12 @@ class TestWithCity(unittest.TestCase):
         obj = City()
         key = "City." + obj.id
         obj.name = 'Tokyo'
+
         models.storage.new(obj)
         models.storage.save()
         models.storage.reload()
         storage_objs = FileStorage._FileStorage__objects
+
         self.assertIn(key, storage_objs)
         self.assertEqual(storage_objs[key].id, obj.id)
         self.assertEqual(storage_objs[key].name, 'Tokyo')
@@ -283,21 +291,34 @@ class TestWithPlace(unittest.TestCase):
         obj.max_guest = 5
         obj.latitude = 77.8
         obj.longitude = 45.23
+        bathroom, kitchen, balcony = Amenity(), Amenity(), Amenity()
+        list_amenity_ids = [bathroom.id, kitchen.id, balcony.id]
+        obj.amenity_ids = list_amenity_ids
+
         models.storage.new(obj)
         models.storage.save()
         models.storage.reload()
         storage_objs = FileStorage._FileStorage__objects
+
         self.assertIn(key, storage_objs)
-        self.assertEqual(storage_objs[key].id, obj.id)
+
         self.assertEqual(type(storage_objs[key].id), str)
-        self.assertEqual(storage_objs[key].name, 'Square Park')
+        self.assertEqual(storage_objs[key].id, obj.id)
+
         self.assertEqual(type(storage_objs[key].name), str)
-        self.assertEqual(storage_objs[key].max_guest, 5)
+        self.assertEqual(storage_objs[key].name, 'Square Park')
+
         self.assertEqual(type(storage_objs[key].max_guest), int)
-        self.assertEqual(storage_objs[key].latitude, 77.8)
+        self.assertEqual(storage_objs[key].max_guest, 5)
+
         self.assertEqual(type(storage_objs[key].latitude), float)
-        self.assertEqual(storage_objs[key].longitude, 45.23)
+        self.assertEqual(storage_objs[key].latitude, 77.8)
+
         self.assertEqual(type(storage_objs[key].longitude), float)
+        self.assertEqual(storage_objs[key].longitude, 45.23)
+
+        self.assertEqual(type(storage_objs[key].amenity_ids), list)
+        self.assertEqual(storage_objs[key].amenity_ids, list_amenity_ids)
 
 
 class TestWithAmenity(unittest.TestCase):
@@ -338,10 +359,12 @@ class TestWithAmenity(unittest.TestCase):
         obj = Amenity()
         key = "Amenity." + obj.id
         obj.name = 'Kitchen'
+
         models.storage.new(obj)
         models.storage.save()
         models.storage.reload()
         storage_objs = FileStorage._FileStorage__objects
+
         self.assertIn(key, storage_objs)
         self.assertEqual(storage_objs[key].id, obj.id)
         self.assertEqual(storage_objs[key].name, 'Kitchen')
@@ -385,10 +408,12 @@ class TestWithReview(unittest.TestCase):
         obj = Review()
         key = "Review." + obj.id
         obj.text = 'Excellent'
+
         models.storage.new(obj)
         models.storage.save()
         models.storage.reload()
         storage_objs = FileStorage._FileStorage__objects
+
         self.assertIn(key, storage_objs)
         self.assertEqual(storage_objs[key].id, obj.id)
         self.assertEqual(storage_objs[key].text, 'Excellent')
