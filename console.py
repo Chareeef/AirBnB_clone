@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 '''The implementation of the console (CLI) for the AirBnB project'''
 import cmd
+import re
 import sys
 from models import storage
 from models.base_model import BaseModel
@@ -35,6 +36,25 @@ class HBNBCommand(cmd.Cmd):
         '''This command exits the program, same as `quit`'''
 
         return True
+
+    @staticmethod
+    def parse_all(line):
+        '''Parse commands such as: BaseModel.all()'''
+
+        cls = line.split('.')[0]
+
+        return f'all {cls}'
+
+    def precmd(self, line):
+        '''Preprocess the command line'''
+
+        commands_parsers = {r'^ *\w+.all\(\) *$': self.parse_all}
+
+        for pattern in commands_parsers:
+            if re.search(pattern, line):
+                return commands_parsers[pattern](line)
+        else:
+            return line
 
     def do_create(self, str_arg):
         '''
