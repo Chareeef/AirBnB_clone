@@ -27,15 +27,20 @@ class HBNBCommand(cmd.Cmd):
             'Review': Review
             }
 
-    def do_quit(self, str_arg):
-        '''This command exits the program, same as `EOF`'''
+    @staticmethod
+    def splitter(str_args):
+        '''
+        Customized split method to handle double-quoted arguments with spaces
 
-        return True
+        Ex: update User 3587-2190-7659 "name" "Robert Downey Jr"
+        '''
+        input_string = str_args
+        arguments = re.findall(r'[^"\s]+|"[^"]*"', input_string)
 
-    def do_EOF(self, str_arg):
-        '''This command exits the program, same as `quit`'''
+        # Clean up the double quotes
+        args = [arg.strip('"') for arg in arguments]
 
-        return True
+        return args
 
     @staticmethod
     def parse_all(line):
@@ -65,12 +70,8 @@ class HBNBCommand(cmd.Cmd):
         splitted.extend(['', '', ''])
         command, cls, inst_id = splitted[1], splitted[0], splitted[2]
 
-        if inst_id[0] in ['\'', '"'] and inst_id[0] == inst_id[-1]:
-            inst_id = inst_id.replace('\'', '').replace('"', '')
-
         new_line = f'{command} {cls} {inst_id}'
 
-        print(new_line)
         return new_line
 
     def precmd(self, line):
@@ -87,7 +88,7 @@ class HBNBCommand(cmd.Cmd):
         else:
             return line
 
-    def do_create(self, str_arg):
+    def do_create(self, str_args):
         '''
         Creates a new instance of a class, saves it (to the JSON file)
         and prints the id.
@@ -95,7 +96,7 @@ class HBNBCommand(cmd.Cmd):
         Ex: (hbnb) create BaseModel
         '''
 
-        args = str_arg.split()
+        args = self.splitter(str_args)
 
         if len(args) == 0:
             print('** class name missing **')
@@ -114,7 +115,7 @@ class HBNBCommand(cmd.Cmd):
 
         return [cls for cls in self.classes if cls.startswith(text)]
 
-    def do_show(self, str_arg):
+    def do_show(self, str_args):
         '''
         Prints the string representation of an instance
         based on the class name and id
@@ -122,7 +123,7 @@ class HBNBCommand(cmd.Cmd):
         Ex: (hbnb) show User 1234-1234-1234
         '''
 
-        args = str_arg.split()
+        args = self.splitter(str_args)
 
         if len(args) < 1:
             print('** class name missing **')
@@ -149,7 +150,7 @@ class HBNBCommand(cmd.Cmd):
 
         return [cls + ' ' for cls in self.classes if cls.startswith(text)]
 
-    def do_destroy(self, str_arg):
+    def do_destroy(self, str_args):
         '''
         Deletes an instance based on the class name and id,
         and saves the change into the JSON file
@@ -157,7 +158,7 @@ class HBNBCommand(cmd.Cmd):
         Ex: (hbnb) destroy BaseModel 1234-1234-1234
         '''
 
-        args = str_arg.split()
+        args = self.splitter(str_args)
 
         if len(args) < 1:
             print('** class name missing **')
@@ -186,7 +187,7 @@ class HBNBCommand(cmd.Cmd):
 
         return [cls + ' ' for cls in self.classes if cls.startswith(text)]
 
-    def do_all(self, str_arg):
+    def do_all(self, str_args):
         """
         Display string representations of all instances of a given class.
         If no class is specified, displays all instantiated objects.
@@ -194,7 +195,8 @@ class HBNBCommand(cmd.Cmd):
         Ex: (hbnb) all Amenity
         """
 
-        args = str_arg.split()
+        args = self.splitter(str_args)
+
         if len(args) > 0 and args[0] not in self.classes:
             print("** class doesn't exist **")
         else:
@@ -218,11 +220,7 @@ class HBNBCommand(cmd.Cmd):
 
         Ex: (hbnb) update User 49faff9a-6318-451f-87b6-9105 first_name "Betty"
         """
-        input_string = str_args
-        arguments = re.findall(r'[^"\s]+|"[^"]*"', input_string)
-
-        # Clean up the double quotes
-        args = [arg.strip('"') for arg in arguments]
+        args = self.splitter(str_args)
         objects = storage.all()
 
         if len(args) == 0:
@@ -248,11 +246,13 @@ class HBNBCommand(cmd.Cmd):
                 return
         if len(args) == 4:
             obj = objects[f"{args[0]}.{args[1]}"]
+
             if args[2] in obj.__class__.__dict__.keys():
                 value_type = type(obj.__class__.__dict__[args[2]])
                 obj.__dict__[args[2]] = value_type(args[3])
             else:
                 obj.__dict__[args[2]] = args[3]
+
         storage.save()
 
     def complete_update(self, text, line, begidx, endix):
@@ -266,7 +266,7 @@ class HBNBCommand(cmd.Cmd):
 
         Executed by typing: (hbnb) <class name>.count()
         """
-        args = str_args.split()
+        args = self.splitter(str_args)
         objects_dict = storage.all()
         counting = 0
 
@@ -283,7 +283,19 @@ class HBNBCommand(cmd.Cmd):
         print(counting)
 
     def emptyline(self):
+        '''Pass when an empty line is entered'''
+
         pass
+
+    def do_quit(self, str_args):
+        '''This command exits the program, same as `EOF`'''
+
+        return True
+
+    def do_EOF(self, str_args):
+        '''This command exits the program, same as `quit`'''
+
+        return True
 
 
 if __name__ == '__main__':
