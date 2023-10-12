@@ -65,8 +65,12 @@ class HBNBCommand(cmd.Cmd):
         splitted.extend(['', '', ''])
         command, cls, inst_id = splitted[1], splitted[0], splitted[2]
 
+        if inst_id[0] in ['\'', '"'] and inst_id[0] == inst_id[-1]:
+            inst_id = inst_id.replace('\'', '').replace('"', '')
+
         new_line = f'{command} {cls} {inst_id}'
 
+        print(new_line)
         return new_line
 
     def precmd(self, line):
