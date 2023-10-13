@@ -246,6 +246,8 @@ class HBNBCommand(cmd.Cmd):
         """
         args = self.splitter(str_args)
         objects = storage.all()
+        if args[3].isdigit():
+            args[3] = int(args[3])
 
         if len(args) == 0:
             print("** class name missing **")
@@ -269,12 +271,10 @@ class HBNBCommand(cmd.Cmd):
                 print("** value missing **")
                 return
         if len(args) == 4:
-            print(type(args[3]))
             obj = objects[f"{args[0]}.{args[1]}"]
 
             if args[2] in obj.__class__.__dict__.keys():
                 value_type = type(obj.__class__.__dict__[args[2]])
-                print(value_type)
                 obj.__dict__[args[2]] = value_type(args[3])
             else:
                 obj.__dict__[args[2]] = args[3]
