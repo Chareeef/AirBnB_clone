@@ -74,13 +74,37 @@ class HBNBCommand(cmd.Cmd):
 
         return new_line
 
+    @staticmethod
+    def parse_update(line):
+        """Parse commands such as: """
+
+        pattern = r'(\w+)\.update\("([^"]+)", "([^"]+)", ("[^"]+"|\d+)'
+
+        match = re.search(pattern, line)
+
+        if match:
+            class_name = match.group(1)
+            _id = match.group(2)
+            attribute_name = match.group(3)
+            attribute_value = match.group(4)
+    
+            if attribute_value.startswith('"') and attribute_value.endswith('"'):
+                attribute_value = attribute_value.strip('"')
+            elif attribute_value.isdigit():
+                attribute_value = int(attribute_value)
+    
+            components = [class_name, _id, attribute_name, attribute_value]
+            print(type(attribute_value))
+            return f"update {class_name} {_id} {attribute_name} {attribute_value}"
+
     def precmd(self, line):
         '''Preprocess the command line'''
 
         cmds_formers = {r'^ *\w*.all\(\) *$': self.parse_all,
                         r'^ *\w*.count\(\) *$': self.parse_count,
                         r'^ *\w*.show\(.*\) *$': self.parse_show_destroy,
-                        r'^ *\w*.destroy\(.*\) *$': self.parse_show_destroy}
+                        r'^ *\w*.destroy\(.*\) *$': self.parse_show_destroy,
+                        r'^ *\w*.update\(.*, .*, .*\) *$': self.parse_update}
 
         for pattern in cmds_formers:
             if re.search(pattern, line):
@@ -245,10 +269,12 @@ class HBNBCommand(cmd.Cmd):
                 print("** value missing **")
                 return
         if len(args) == 4:
+            print(type(args[3]))
             obj = objects[f"{args[0]}.{args[1]}"]
 
             if args[2] in obj.__class__.__dict__.keys():
                 value_type = type(obj.__class__.__dict__[args[2]])
+                print(value_type)
                 obj.__dict__[args[2]] = value_type(args[3])
             else:
                 obj.__dict__[args[2]] = args[3]
