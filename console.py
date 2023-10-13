@@ -36,7 +36,7 @@ class HBNBCommand(cmd.Cmd):
         '''
 
         arguments = re.findall(r'([^\'"\s]+|"[^"]*"|\'[^\']*\')', str_args)
-        
+
         if len(arguments) > 3:
             copy_attr = arguments[3]
 
@@ -77,7 +77,7 @@ class HBNBCommand(cmd.Cmd):
         line = line.strip()
         line = line[:-1]
         line = line.replace('.', ' ', 1).replace('(', ' ', 1).replace(',', '')
-        splitted= line.split()
+        splitted = line.split()
 
         splitted.extend(['', '', ''])
         command, cls, inst_id = splitted[1], splitted[0], splitted[2]
@@ -88,30 +88,50 @@ class HBNBCommand(cmd.Cmd):
 
     @staticmethod
     def parse_update(line):
-        """Parse commands such as: """
+        """Parse commands like: User.update(1723-5609, "name", "Robert Jr")"""
 
-        pattern = r'(\w+)\.update\(([^"]+|"[^"]*"), ([^"]+|"[^"]*"), (.+)\)'
+        update_p = r'^ *(?P<cls>\w+)?.update\('
+        update_p += r'(?P<id>[\w\'"][^,]*)?'
+        update_p += r'(, *(?P<name>[\w\'"]*[^,]*))?'
+        update_p += r'(, *(?P<value>[\w\'"]*[^,]*))?'
+        update_p += r'(, *.+)*\) *$'
 
-        match = re.search(pattern, line)
+        match = re.search(update_p, line)
 
         if match:
-            class_name = match.group(1)
-            _id = match.group(2)
-            attribute_name = match.group(3)
-            attribute_value = match.group(4)
- 
-            components = [class_name, _id, attribute_name, attribute_value]
+            class_name = match.group('cls')
+            if not class_name:
+                class_name = ''
+            _id = match.group('id')
+            if not _id:
+                _id = ''
+            attr_name = match.group('name')
+            if not attr_name:
+                attr_name = ''
+            attr_value = match.group('value')
+            if not attr_value:
+                attr_value = ''
 
-            return f"update {class_name} {_id} {attribute_name} {attribute_value}"
+            new_line = f"update {class_name} {_id} {attr_name} {attr_value}"
+            return new_line
 
     def precmd(self, line):
         '''Preprocess the command line'''
+
+        update_p = r'^ *(?P<cls>\w+)?.update\('
+        update_p += r'(?P<id>[\w\'"][^,]*)?'
+        update_p += r'(, *(?P<name>[\w\'"]*[^,]*))?'
+        update_p += r'(, *(?P<value>[\w\'"]*))?'
+        update_p += r'(, *.+)*\) *$'
+
+        #update_p = r'^ *(?P<cls>\w+)?.update\((?P<id>.+)?(, '
+        #update_p += r'*(?P<name>.*))?(,*(?P<value>.*))?(, *.+)*\) *$'
 
         cmds_formers = {r'^ *\w*.all\(\) *$': self.parse_all,
                         r'^ *\w*.count\(\) *$': self.parse_count,
                         r'^ *\w*.show\(.*\) *$': self.parse_show_destroy,
                         r'^ *\w*.destroy\(.*\) *$': self.parse_show_destroy,
-                        r'^ *\w*.update\(.*, .*, .*\) *$': self.parse_update}
+                        update_p: self.parse_update}
 
         for pattern in cmds_formers:
             if re.search(pattern, line):
