@@ -34,13 +34,23 @@ class HBNBCommand(cmd.Cmd):
 
         Ex: update User 3587-2190-7659 "name" "Robert Downey Jr"
         '''
-        input_string = str_args
-        arguments = re.findall(r'[^"\s]+|"[^"]*"', input_string)
 
-        # Clean up the double quotes
-        args = [arg.strip('"') for arg in arguments]
+        arguments = re.findall(r'([^\'"\s]+|"[^"]*"|\'[^\']*\')', str_args)
+        
+        if len(arguments) > 3:
+            copy_attr = arguments[3]
 
-        return args
+        # Clean up the  quotes
+        for i in range(len(arguments)):
+            if arguments[i][0] == '"' and arguments[i][-1] == '"':
+                arguments[i] = arguments[i].strip('"')
+            elif arguments[i][0] == '\'' and arguments[i][-1] == '\'':
+                arguments[i] = arguments[i].strip('\'')
+
+        if len(arguments) > 3:
+            arguments[3] = copy_attr
+
+        return arguments
 
     @staticmethod
     def parse_all(line):
@@ -60,7 +70,9 @@ class HBNBCommand(cmd.Cmd):
 
     @staticmethod
     def parse_show_destroy(line):
-        '''Parse commands such as: <model>.show() or <model>.destroy'''
+        '''
+        Parse commands like: <model>.show("66-79") or <model>.destroy("68-46")
+        '''
 
         line = line.strip()
         line = line[:-1]
@@ -78,7 +90,7 @@ class HBNBCommand(cmd.Cmd):
     def parse_update(line):
         """Parse commands such as: """
 
-        pattern = r'(\w+)\.update\("([^"]+)", "([^"]+)", ("[^"]+"|\d+)'
+        pattern = r'(\w+)\.update\(([^"]+|"[^"]*"), ([^"]+|"[^"]*"), (.+)\)'
 
         match = re.search(pattern, line)
 
@@ -87,14 +99,9 @@ class HBNBCommand(cmd.Cmd):
             _id = match.group(2)
             attribute_name = match.group(3)
             attribute_value = match.group(4)
-    
-            if attribute_value.startswith('"') and attribute_value.endswith('"'):
-                attribute_value = attribute_value.strip('"')
-            elif attribute_value.isdigit():
-                attribute_value = int(attribute_value)
-    
+ 
             components = [class_name, _id, attribute_name, attribute_value]
-            print(type(attribute_value))
+
             return f"update {class_name} {_id} {attribute_name} {attribute_value}"
 
     def precmd(self, line):
@@ -246,8 +253,6 @@ class HBNBCommand(cmd.Cmd):
         """
         args = self.splitter(str_args)
         objects = storage.all()
-        if args[3].isdigit():
-            args[3] = int(args[3])
 
         if len(args) == 0:
             print("** class name missing **")
@@ -277,7 +282,7 @@ class HBNBCommand(cmd.Cmd):
                 value_type = type(obj.__class__.__dict__[args[2]])
                 obj.__dict__[args[2]] = value_type(args[3])
             else:
-                obj.__dict__[args[2]] = args[3]
+                obj.__dict__[args[2]] = eval(args[3])
 
         storage.save()
 
