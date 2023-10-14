@@ -118,14 +118,14 @@ class HBNBCommand(cmd.Cmd):
     def precmd(self, line):
         '''Preprocess the command line'''
 
+        if not sys.stdin.isatty():
+            print()
+
         update_p = r'^ *(?P<cls>\w+)?.update\('
         update_p += r'(?P<id>[\w\'"][^,]*)?'
         update_p += r'(, *(?P<name>[\w\'"]*[^,]*))?'
         update_p += r'(, *(?P<value>[\w\'"]*))?'
         update_p += r'(, *.+)*\) *$'
-
-        #update_p = r'^ *(?P<cls>\w+)?.update\((?P<id>.+)?(, '
-        #update_p += r'*(?P<name>.*))?(,*(?P<value>.*))?(, *.+)*\) *$'
 
         cmds_formers = {r'^ *\w*.all\(\) *$': self.parse_all,
                         r'^ *\w*.count\(\) *$': self.parse_count,
@@ -351,5 +351,3 @@ class HBNBCommand(cmd.Cmd):
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
-    if not sys.stdin.isatty():
-        print()

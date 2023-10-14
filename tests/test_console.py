@@ -23,6 +23,7 @@ from models.place import Place
 from models.amenity import Amenity
 from models.review import Review
 
+
 class TestOrdinaryCommands(unittest.TestCase):
     """
     Unittests the typical console commands
