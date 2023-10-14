@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 """This module implements the Place class"""
-import models
+from models.base_model import BaseModel
 
 
-class Place(models.base_model.BaseModel):
+class Place(BaseModel):
     """
     The Place class that inherits from BaseModel
 
