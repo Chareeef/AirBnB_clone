@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 """This module implements the City class"""
-import models
+from models.base_model import BaseModel
 
 
-class City(models.base_model.BaseModel):
+class City(BaseModel):
     """
     The City class that inherits from BaseModel
 
