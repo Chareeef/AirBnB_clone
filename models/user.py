@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""This module implements the BaseModel class"""
+"""This module implements the User class"""
 import models
 
 
