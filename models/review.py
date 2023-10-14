@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 """This module implements the Review class"""
-import models
+from models.base_model import BaseModel
 
 
-class Review(models.base_model.BaseModel):
+class Review(BaseModel):
     """
     The Review class that inherits from BaseModel
 
