@@ -37,6 +37,16 @@ class HBNBCommand(cmd.Cmd):
 
         arguments = re.findall(r'([^\'"\s]+|"[^"]*"|\'[^\']*\')', str_args)
 
+        if len(arguments) > 2:
+            if arguments[2][0] == '{' and arguments[-1][-1] == '}':
+                arguments[2] = ''.join(arguments[2:])
+                del arguments[3:]
+                if arguments[1][0] == '"' and arguments[1][-1] == '"':
+                    arguments[1] = arguments[1].strip('"')
+                elif arguments[1][0] == '\'' and arguments[1][-1] == '\'':
+                    arguments[1] = arguments[1].strip('\'')
+
+                return arguments
         if len(arguments) > 3:
             copy_attr = arguments[3]
 
@@ -115,6 +125,34 @@ class HBNBCommand(cmd.Cmd):
             new_line = f"update {class_name} {_id} {attr_name} {attr_value}"
             return new_line
 
+    @staticmethod
+    def parse_update_2(line):
+        """
+        Parse commands like:
+        (hbnb) User.update("6693-5721", {"first_name":  "John", "age": 89})
+        """
+
+        update_p2 = r'^ *(?P<cls>\w+)?.update\('
+        update_p2 += r'(?P<id>[\w\'"][^,]*)'
+        update_p2 += r'(, *(?P<dict>{.*}))'
+        update_p2 += r'(, *.+)*\) *$'
+
+        match = re.search(update_p2, line)
+
+        if match:
+            class_name = match.group('cls')
+            if not class_name:
+                class_name = ''
+            _id = match.group('id')
+            if not _id:
+                _id = ''
+            obj_dict = match.group('dict')
+            if not obj_dict:
+                obj_dict = ''
+
+            new_line = f"update {class_name} {_id} {obj_dict}"
+            return new_line
+
     def precmd(self, line):
         '''Preprocess the command line'''
 
@@ -127,10 +165,16 @@ class HBNBCommand(cmd.Cmd):
         update_p += r'(, *(?P<value>[\w\'"]*))?'
         update_p += r'(, *.+)*\) *$'
 
+        update_p2 = r'^ *(?P<cls>\w+)?.update\('
+        update_p2 += r'(?P<id>[\w\'"][^,]*)'
+        update_p2 += r'(, *(?P<dict>{.*}))'
+        update_p2 += r'(, *.+)*\) *$'
+
         cmds_formers = {r'^ *\w*.all\(\) *$': self.parse_all,
                         r'^ *\w*.count\(\) *$': self.parse_count,
                         r'^ *\w*.show\(.*\) *$': self.parse_show_destroy,
                         r'^ *\w*.destroy\(.*\) *$': self.parse_show_destroy,
+                        update_p2: self.parse_update_2,
                         update_p: self.parse_update}
 
         for pattern in cmds_formers:
@@ -277,24 +321,36 @@ class HBNBCommand(cmd.Cmd):
         if len(args) == 0:
             print("** class name missing **")
             return
+
         if args[0] not in self.classes:
             print("** class doesn't exist **")
             return
+
         if len(args) == 1:
             print("** instance id missing **")
             return
+
         if f"{args[0]}.{args[1]}" not in objects.keys():
             print("** no instance found **")
             return
+
         if len(args) == 2:
             print("** attribute name missing **")
             return
+
         if len(args) == 3:
             try:
                 type(eval(args[2])) != dict
             except NameError:
                 print("** value missing **")
                 return
+
+            obj = objects[f"{args[0]}.{args[1]}"]
+            dict_attrs = eval(args[2])
+
+            for key, val in dict_attrs.items():
+                setattr(obj, key, val)
+
         if len(args) == 4:
             obj = objects[f"{args[0]}.{args[1]}"]
 
