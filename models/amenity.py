@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 """This module implements the Amenity class"""
-import models
+from models.base_model import BaseModel
 
 
-class Amenity(models.base_model.BaseModel):
+class Amenity(BaseModel):
     """
     The Amenity class that inherits from BaseModel
 
