@@ -59,11 +59,10 @@
     font-size: 14px;
     font-weight: 400;
     margin-bottom: auto;
-    padding-bottom: auto;
 }
 
 .container .filter .popover {
-    visibility: hidden;
+    display: none;
     background: #FAFAFA;
     border: 1px solid #DDD;
     border-radius: 4px;
@@ -82,5 +81,5 @@
 
 .container .filter .locations:hover > .popover,
 .container .filter .amenities:hover > .popover {
-    visibility: visible;
+    display: block;
 }
